@@ -4,7 +4,6 @@
     <title>Peta Drone Gunasari - Leaflet</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Memanggil Pustaka Leaflet CSS dan JS -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
     <style>
@@ -14,23 +13,41 @@
 <body>
     <div id="map"></div>
     <script>
-        // Mengatur titik tengah peta awal ke wilayah Gunasari / Cintanagara Anda
+        // 1. Mengatur posisi tengah kamera otomatis ke lokasi drone Anda di Gunasari
         var map = L.map('map').setView([-7.332306, 108.384666], 17);
 
-        // Menggunakan Peta Dasar OpenStreetMap yang 100% Gratis Tanpa API Key
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // 2. Memasang Peta Dasar Satelit Dunia (Alternatif Google Maps yang Gratis & Legal)
+        L.tileLayer('https://arcgisonline.com{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EPR, and the GIS User Community'
         }).addTo(map);
 
-        // Menampilkan Lapisan Foto Udara Drone Anda di atas peta dasar
-        // Kode ini otomatis membaca folder Z17, Z18, Z19 di GitHub Anda
-        L.tileLayer('./Z{z}/{y}/{x}.png', {
+        // 3. Rumus Pencocokan Koordinat Global Mapper ke Leaflet (Agar Tidak Kosong)
+        L.TileLayer.GlobalMapper = L.TileLayer.extend({
+            getTileUrl: function(coords) {
+                var z = coords.z;
+                var x = coords.x;
+                var y = coords.y;
+                
+                // Batasan area gambar drone Anda berdasarkan file index asli
+                if (z == 17 && x >= 105004 && x <= 105005 && y >= 68164 && y <= 68165) {
+                    return "./Z" + z + "/" + y + "/" + x + ".png";
+                } else if (z == 18 && x >= 210008 && x <= 210011 && y >= 136328 && y <= 136331) {
+                    return "./Z" + z + "/" + y + "/" + x + ".png";
+                } else if (z == 19 && x >= 420016 && x <= 420023 && y >= 272656 && y <= 272662) {
+                    return "./Z" + z + "/" + y + "/" + x + ".png";
+                }
+                return L.Util.emptyImageUrl;
+            }
+        });
+
+        // 4. Menampilkan Lapisan Gambar Drone Anda di Atas Peta Satelit
+        var droneLayer = new L.TileLayer.GlobalMapper('', {
             minZoom: 17,
             maxZoom: 19,
-            tms: false, // ubah jadi true jika ubin gambar drone terbalik ke belahan bumi lain
             opacity: 1.0
-        }).addTo(map);
+        });
+        droneLayer.addTo(map);
     </script>
 </body>
 </html>
