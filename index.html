@@ -1,70 +1,36 @@
-html<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://w3.org">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="content-type" content-type="text/html; charset=utf-8"/>
-    <title>My Map Set Name (Google Maps Export from Global Mapper)</title>
-    <script type="text/javascript" src="https://google.com"></script>
-    <script type="text/javascript">
-
-    var G = google.maps;
-    var map;
-
-    var customMapType = new G.ImageMapType
-    (
-        {
-            getTileUrl: function(coord, zoom)
-            {
-                var normalizedCoord = getNormalizedCoord(coord, zoom);
-                if (!normalizedCoord) { return null; }
-
-                if ( zoom == 17 && normalizedCoord.x >= 105004 && normalizedCoord.x <= 105005 && normalizedCoord.y >= 68164 && normalizedCoord.y <= 68165 )
-                {
-                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
-                }
-                else if ( zoom == 18 && normalizedCoord.x >= 210008 && normalizedCoord.x <= 210011 && normalizedCoord.y >= 136328 && normalizedCoord.y <= 136331 )
-                {
-                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
-                }
-                else if ( zoom == 19 && normalizedCoord.x >= 420016 && normalizedCoord.x <= 420023 && normalizedCoord.y >= 272656 && normalizedCoord.y <= 272662 )
-                {
-                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
-                }
-                return null;
-            },
-            tileSize: new G.Size(256, 256),
-            isPng: true,
-            maxZoom: 19,
-            minZoom: 17,
-            name: "Global Mapper Tiles"
-        }
-    );
-
-    function initialize() 
-    {
-        var myOptions = {
-          zoom: 17,
-          center: new G.LatLng(-7.332306, 108.384666),
-          mapTypeControlOptions: {
-            mapTypeIds: [G.MapTypeId.ROADMAP, 'custom']
-          }
-        };
-        map = new G.Map(document.getElementById("map_canvas"), myOptions);
-        map.mapTypes.set('custom', customMapType);
-        map.setMapTypeId('custom');
-    }
-
-    function getNormalizedCoord(coord, zoom) 
-    {
-        var y = coord.y;
-        var x = coord.x;
-        var tileRange = 1 << zoom;
-        if (y < 0 || y >= tileRange) { return null; }
-        if (x < 0 || x >= tileRange) { x = (x % tileRange + tileRange) % tileRange; }
-        return {x: x, y: y};
-    }
-    </script>
+    <title>Peta Drone Gunasari - Leaflet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Memanggil Pustaka Leaflet CSS dan JS -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
+    <style>
+        html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
+    </style>
 </head>
-<body onload="initialize()">
-    <div id="map_canvas" style="width: 100%; height: 800px; margin: 0px 0px 0px 0px; position: relative; overflow: hidden;"></div>
+<body>
+    <div id="map"></div>
+    <script>
+        // Mengatur titik tengah peta awal ke wilayah Gunasari / Cintanagara Anda
+        var map = L.map('map').setView([-7.332306, 108.384666], 17);
+
+        // Menggunakan Peta Dasar OpenStreetMap yang 100% Gratis Tanpa API Key
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Menampilkan Lapisan Foto Udara Drone Anda di atas peta dasar
+        // Kode ini otomatis membaca folder Z17, Z18, Z19 di GitHub Anda
+        L.tileLayer('./Z{z}/{y}/{x}.png', {
+            minZoom: 17,
+            maxZoom: 19,
+            tms: false, // ubah jadi true jika ubin gambar drone terbalik ke belahan bumi lain
+            opacity: 1.0
+        }).addTo(map);
+    </script>
 </body>
 </html>
