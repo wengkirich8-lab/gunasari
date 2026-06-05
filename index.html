@@ -1,1 +1,70 @@
+html<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://w3.org">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content-type="text/html; charset=utf-8"/>
+    <title>My Map Set Name (Google Maps Export from Global Mapper)</title>
+    <script type="text/javascript" src="https://google.com"></script>
+    <script type="text/javascript">
 
+    var G = google.maps;
+    var map;
+
+    var customMapType = new G.ImageMapType
+    (
+        {
+            getTileUrl: function(coord, zoom)
+            {
+                var normalizedCoord = getNormalizedCoord(coord, zoom);
+                if (!normalizedCoord) { return null; }
+
+                if ( zoom == 17 && normalizedCoord.x >= 105004 && normalizedCoord.x <= 105005 && normalizedCoord.y >= 68164 && normalizedCoord.y <= 68165 )
+                {
+                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
+                }
+                else if ( zoom == 18 && normalizedCoord.x >= 210008 && normalizedCoord.x <= 210011 && normalizedCoord.y >= 136328 && normalizedCoord.y <= 136331 )
+                {
+                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
+                }
+                else if ( zoom == 19 && normalizedCoord.x >= 420016 && normalizedCoord.x <= 420023 && normalizedCoord.y >= 272656 && normalizedCoord.y <= 272662 )
+                {
+                    return "./Z" + zoom + "/" + normalizedCoord.y + "/" + normalizedCoord.x + ".png";
+                }
+                return null;
+            },
+            tileSize: new G.Size(256, 256),
+            isPng: true,
+            maxZoom: 19,
+            minZoom: 17,
+            name: "Global Mapper Tiles"
+        }
+    );
+
+    function initialize() 
+    {
+        var myOptions = {
+          zoom: 17,
+          center: new G.LatLng(-7.332306, 108.384666),
+          mapTypeControlOptions: {
+            mapTypeIds: [G.MapTypeId.ROADMAP, 'custom']
+          }
+        };
+        map = new G.Map(document.getElementById("map_canvas"), myOptions);
+        map.mapTypes.set('custom', customMapType);
+        map.setMapTypeId('custom');
+    }
+
+    function getNormalizedCoord(coord, zoom) 
+    {
+        var y = coord.y;
+        var x = coord.x;
+        var tileRange = 1 << zoom;
+        if (y < 0 || y >= tileRange) { return null; }
+        if (x < 0 || x >= tileRange) { x = (x % tileRange + tileRange) % tileRange; }
+        return {x: x, y: y};
+    }
+    </script>
+</head>
+<body onload="initialize()">
+    <div id="map_canvas" style="width: 100%; height: 800px; margin: 0px 0px 0px 0px; position: relative; overflow: hidden;"></div>
+</body>
+</html>
